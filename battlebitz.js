@@ -25,7 +25,9 @@ client.on('messageCreate', message => {
     let challenged = user.toString();
 
     message.channel.send(`${challenged}, ${author1} has challenged you to a duel, Accept or Decline?`)
-        if (message.channel.awaitMessages(response => response.content.toLowerCase() ==='yes' && message.author.id == dueler2 || response.content.toLowerCase() === 'no' && response.author.id == dueler2,))
+        if (message.channel.awaitMessages(response => response.content.toLowerCase() ==='yes' && message.author.id == dueler2 || response.content.toLowerCase() === 'no' && response.author.id == dueler2,)){
+            
+        }
 
 
 
