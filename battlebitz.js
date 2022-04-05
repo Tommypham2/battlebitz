@@ -6,7 +6,9 @@ const client = new Client({ intents: [Intents.FLAGS.GUILDS, Intents.FLAGS.GUILD_
 
 client.commands = new Collection();
 
-client.login('OTU4MTA0MDI5ODA2ODU4Mjkw.YkId6Q.Zzj7E6apduSh-kl-lUIL5memrpY');
+const config = require('./config.json');
+client.login(config.token);
+
 const prefix = '!';
 
 console.log('running');
@@ -17,37 +19,36 @@ client.on('messageCreate', message => {
     let person1 = message.author.username;
     let user = message.mentions.users.first();
 
-    if (!user) return message.reply('Participant has not been selected, who would you like to duel?'); //checks to see if user selected anoter person to duel.
+    /*if (!user) return message.reply('Participant has not been selected, who would you like to duel?'); //checks to see if user selected anoter person to duel.
     if (user.id == message.author.id) return message.reply('Cant duel yourself silly.'); //checks to see if user dueled himself.
-    if (user.bot == true) return message.reply('Cant duel the bot'); //checks to see if the retard tried to duel the bot.
+    if (user.bot == true) return message.reply('Cant duel the bot'); //checks to see if the retard tried to duel the bot.*/
 
     let dueler1 = message.author.id;
-    let dueler2 = user.id;
+    //let dueler2 = ;
 
     let challenged = user;
 
-    message.channel.send(`${challenged.toString()}, ${dueler1} has challenged you to a duel, Accept or Decline?`); //request duel
-    
-    
-    const msgFilter = (m) => m.author.id === challenged.id;
-    
-    message.channel.awaitMessages({ msgFilter , max: 2, time: 60_000, errors: ['time'] })
-        .then((collected) => {
-            console.log(collected)
-        
+    let filter = m => m.author.id === message.author.id
+    message.channel.send(`${challenged}, ${dueler1} has challenged you to a duel, yes or no?`).then(() => {
+      message.channel.awaitMessages(filter, {
+          max: 1,
+          time: 30000,
+          errors: ['time']
         })
-        .catch(collected => console.log('After a minute, only ${collected.size} out of 4 voted.'));
-    
-
-    /*
-    if (message.channel.awaitMessages(response => response.content.toLowerCase() ==='yes' && message.author.id == dueler2)){
-        message.channel.send('Battle and Bitz duel has begun!');
-    } else if (message.channel.awaitMessages (response => response.content.toLowerCase() === 'no' && response.author.id == dueler2,)) {
-        message.channel.send('Pussy ass bitch');
-    };
-    */
-
-
+        .then(message => {
+            message = message.first()
+            if (message.channel.awaitMessages(response => response.content.toLowerCase() ==='yes'&& response.author.id == dueler2)) {
+              message.channel.send('Battle and Bitz duel has begun!');
+            } else if (message.channel.awaitMessages (response => response.content.toLowerCase() === 'no'&& response.author.id == dueler2)) {
+              message.channel.send(`Pussy Ass Bitch`);
+            } else {
+              message.channel.send(`Invalid response, select: yes or no.`);
+            }
+          })
+        .catch(collected => {
+            message.channel.send('Request Timed Out');
+        })
+    })
 
 
 
