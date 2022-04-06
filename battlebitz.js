@@ -1,6 +1,6 @@
 require('dotenv').config();
 
-const { Client, Collection, Intents } = require('discord.js');
+const { Client, Collection, Intents, CommandInteractionOptionResolver, Message } = require('discord.js');
 const client = new Client({ intents: [Intents.FLAGS.GUILDS, Intents.FLAGS.GUILD_MESSAGES] });
 
 
@@ -11,47 +11,39 @@ client.login(config.token);
 
 const prefix = '!';
 
-console.log('running');
+//Ready function to show bot is running.
+client.on('ready', () => {
+  console.log(`${client.user.username}`);
+})
+
 
 
 client.on('messageCreate', message => {
-    if (!message.content.startsWith(prefix,'duel') || message.author.bot) return;
-    let person1 = message.author.username;
-    let user = message.mentions.users.first();
+  let dueler = message.author.id;
+  let user = message.mentions.users.first();
+  let challenged = user;
 
-    /*if (!user) return message.reply('Participant has not been selected, who would you like to duel?'); //checks to see if user selected anoter person to duel.
-    if (user.id == message.author.id) return message.reply('Cant duel yourself silly.'); //checks to see if user dueled himself.
-    if (user.bot == true) return message.reply('Cant duel the bot'); //checks to see if the retard tried to duel the bot.*/
-
-    let dueler1 = message.author.id;
-    //let dueler2 = ;
-
-    let challenged = user;
-
-    let filter = m => m.author.id === message.author.id
-    message.channel.send(`${challenged}, ${dueler1} has challenged you to a duel, yes or no?`).then(() => {
-      message.channel.awaitMessages(filter, {
-          max: 1,
-          time: 30000,
-          errors: ['time']
-        })
-        .then(message => {
-            message = message.first()
-            if (message.channel.awaitMessages(response => response.content.toLowerCase() ==='yes'&& response.author.id == dueler2)) {
-              message.channel.send('Battle and Bitz duel has begun!');
-            } else if (message.channel.awaitMessages (response => response.content.toLowerCase() === 'no'&& response.author.id == dueler2)) {
-              message.channel.send(`Pussy Ass Bitch`);
-            } else {
-              message.channel.send(`Invalid response, select: yes or no.`);
-            }
-          })
-        .catch(collected => {
-            message.channel.send('Request Timed Out');
-        })
-    })
-
-
-
+  if (message.content.startsWith === prefix +'duel'){
+    message.channel.send('Who would you like to duel?');
+   } else if ((message.content.startsWith == prefix + 'duel')){
+        message.channel.send(`${challenged}, ${dueler} has challenged you to a duel. Do you accept the challenge, yes or no?`)
+        .then(() => {
+            message.channel.awaitMessages(response => response.content == 'yes' || response.content == 'no', {
+                max: 1,
+                time: 60000,
+                errors: ['time'],
+            })
+            .then((collected) => {
+                if (collected.first().content == 'yes') {
+                    message.channel.send(`${challenged} has accepted the duel!`);
+                }
+                else if(collected.first().content == 'no') {
+                    message.channel.send(`You must not get any bitches, sorry.`);
+                }
+            })
+            .catch(() => {
+                message.channel.send(`Duel request timed out`);
+            });
+        }); 
+   }
 })
-
-    
