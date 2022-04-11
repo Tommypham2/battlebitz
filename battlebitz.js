@@ -21,14 +21,13 @@ client.on('ready', () => {
 client.on('messageCreate', message => {
   let dueler = message.author.id;
   let user = message.mentions.users.first();
-  let challenged = user;
+  let challenged = user.toString();
+  const filter = m => m.author.id ===  message.author.id;
 
-  if (message.content.startsWith === prefix +'duel'){
-    message.channel.send('Who would you like to duel?');
-   } else if ((message.content.startsWith == prefix + 'duel')){
+  if ((message.content.startsWith (prefix + 'duel' ))){
         message.channel.send(`${challenged}, ${dueler} has challenged you to a duel. Do you accept the challenge, yes or no?`)
         .then(() => {
-            message.channel.awaitMessages(response => response.content == 'yes' || response.content == 'no', {
+            message.channel.awaitMessages( response => response.content == 'yes' || response.content == 'no', {
                 max: 1,
                 time: 60000,
                 errors: ['time'],
@@ -45,5 +44,5 @@ client.on('messageCreate', message => {
                 message.channel.send(`Duel request timed out`);
             });
         }); 
-   }
-})
+    }
+    })
