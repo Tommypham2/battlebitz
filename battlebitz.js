@@ -1,15 +1,28 @@
 require('dotenv').config();
 
-const { Client, Collection, Intents, CommandInteractionOptionResolver, Message } = require('discord.js');
+const { Client, Collection, Intents, CommandInteractionOptionResolver, Message, DiscordAPIError } = require('discord.js');
 const client = new Client({ intents: [Intents.FLAGS.GUILDS, Intents.FLAGS.GUILD_MESSAGES] });
 
-
-client.commands = new Collection();
-
+//Discord token
 const config = require('./config.json');
 client.login(config.token);
 
+//commands folder
+client.commands = new Collection();
+const fs = require('fs');
+const commandFiles = fs.readdirSync('./commands/').filter(file => file.endsWith('.js'));
+for(const file of commandFiles){
+    const command = require(`./commands/${file}`);
+
+    client.commands.set(command.name, command);
+}
+
+
+
+//sets command prefix
 const prefix = '!';
+
+
 
 //Ready function to show bot is running.
 client.on('ready', () => {
@@ -17,32 +30,17 @@ client.on('ready', () => {
 })
 
 
+//main
+client.on('message', message =>{
+    if(!message.content.startsWith(prefix) || message.author.bot) return;
 
-client.on('messageCreate', message => {
-  let dueler = message.author.id;
-  let user = message.mentions.users.first();
-  let challenged = user.toString();
-  const filter = m => m.author.id ===  message.author.id;
+    const args = message.content.slice(prefix.length).split(/ +/); //registers mutiple spaced inputs
+    const command = args.shift().toLowerCase(); //shifts input into lowercase
 
-  if ((message.content.startsWith (prefix + 'duel' ))){
-        message.channel.send(`${challenged}, ${dueler} has challenged you to a duel. Do you accept the challenge, yes or no?`)
-        .then(() => {
-            message.channel.awaitMessages( response => response.content == 'yes' || response.content == 'no', {
-                max: 1,
-                time: 60000,
-                errors: ['time'],
-            })
-            .then((collected) => {
-                if (collected.first().content == 'yes') {
-                    message.channel.send(`${challenged} has accepted the duel!`);
-                }
-                else if(collected.first().content == 'no') {
-                    message.channel.send(`You must not get any bitches, sorry.`);
-                }
-            })
-            .catch(() => {
-                message.channel.send(`Duel request timed out`);
-            });
-        }); 
+    if(command === 'ping'){
+        client.commands.get('ping').execute(message, args); //ping command for funzies
     }
-    })
+
+   
+    
+});
