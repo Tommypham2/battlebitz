@@ -2,7 +2,6 @@ require('dotenv').config();
 
 const { Client, Collection, Intents, CommandInteractionOptionResolver, Message, DiscordAPIError } = require('discord.js');
 const client = new Client({ intents: [Intents.FLAGS.GUILDS, Intents.FLAGS.GUILD_MESSAGES] });
-
 //Discord token
 const config = require('./config.json');
 client.login(config.token);
@@ -32,6 +31,8 @@ client.on('ready', () => {
 
 let coins = require('./coins.json');
 client.on('messageCreate', message =>{
+    const args = message.content.slice(prefix.length).split(/ +/); //registers mutiple spaced inputs
+    const command = args.shift().toLowerCase(); //shifts input into lowercase
     if(message.content === `${prefix}name`){
         message.channel.send(`Username: ${message.author.username}`);
         message.channel.send(`Id: ${message.author.id}`);
@@ -45,10 +46,38 @@ client.on('messageCreate', message =>{
 
     let coinAmt = Math.floor(Math.random() * 1) + 1;
     let baseAmt = Math.floor(Math.random() * 1) + 1;
+    let ucoins = coins[message.author.id].coins;
     console.log(`${coinAmt} ; ${baseAmt}`);
 
 
-    if(coinAmt === baseAmt){
+    /*if(coinAmt === baseAmt){
+        coins[message.author.id] = {
+            coins: coins[message.author.id].coins + coinAmt
+        };
+        fs.writeFile('./coins.json', JSON.stringify(coins),(err) => {
+            if(err) console.log(err)
+        })
+    }*/
+    if(message.content === `${prefix}balance`){
+        message.channel.send(String(ucoins));
+    }
+
+    let playerOne = message.author.username;
+    let playerTwo = "Bot";
+    let rollOne = Math.floor(Math.random() * 15)+ 1;
+    let rollTwo = Math.floor(Math.random() * 15)+ 1;
+   
+    if(message.content === `${prefix}roll`){
+        message.channel.send(playerOne + ": Your roll is: " + String(rollOne));
+        message.channel.send(playerTwo + ": Your roll is: " + String(rollTwo));
+    }else if(rollOne > rollTwo){
+        message.channel.send(playerOne + "Wins!");
+
+    } else if(rollOne < rollTwo)
+    {
+        message.channel.send(playerOne + "Losses!");
+    }
+    if(rollOne > rollTwo){
         coins[message.author.id] = {
             coins: coins[message.author.id].coins + coinAmt
         };
